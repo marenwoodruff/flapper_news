@@ -28,8 +28,8 @@ app.controller('MainCtrl', [
         link: $scope.link,
         upvotes: 0,
         comments: [
-          {author: 'Joe', body: 'Cool post!', upvotes: 0},
-          {author: 'Bob', body: 'Great idea but everything is wrong!', upvotes: 0}
+          // {author: 'Joe', body: 'Cool post!', upvotes: 0},
+          // {author: 'Bob', body: 'Great idea but everything is wrong!', upvotes: 0}
         ]
       });
       $scope.title = ''; // clearing out the title after it is submitted
@@ -47,7 +47,22 @@ app.controller('PostsCtrl', [
   '$stateParams',
   'posts',
   function($scope, $stateParams, posts) {
-    $scope.post = posts.posts[$stateParams.id]; // use the index as the id/$stateParams will retrieve the id from the url and grab the correct post
+    // use the index as the id/$stateParams will retrieve the id from the url and grab the correct post
+    $scope.post = posts.posts[$stateParams.id]; 
+
+    $scope.addComment = function(){
+      if($scope.body === '') { return; }
+      $scope.post.comments.push({
+        body: $scope.body,
+        author: 'user',
+        upvotes: 0
+      });
+      $scope.body = '';
+    };
+
+    $scope.incrementUpvotes = function(comment) {
+      comment.upvotes += 1;
+    }
   }
 ]);
 
@@ -61,11 +76,11 @@ app.config([
         url: '/home',
         templateUrl: 'templates/home.html',
         controller: 'MainCtrl'
-      });
+      })
 
       .state('posts', {
         url: '/posts/{id}', // brackets make id a route parameter, that is available to the controller
-        templateUrl: '/posts.html',
+        templateUrl: 'templates/posts.html',
         controller: 'PostsCtrl'
       });
 
