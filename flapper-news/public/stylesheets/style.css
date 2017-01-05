@@ -6,3 +6,14 @@ body {
 a {
   color: #00B7FF;
 }
+
+.glyphicon-thumbs-up {
+  cursor: pointer;
+} 
+.comment-body {
+  font-size: 20px;
+  margin-left: 10px;
+}
+form {
+  margin-top: 30px;
+}

@@ -74,13 +74,13 @@ app.config([
     $stateProvider
       .state('home', {
         url: '/home',
-        templateUrl: 'templates/home.html',
+        templateUrl: '/home.html',
         controller: 'MainCtrl'
       })
 
       .state('posts', {
         url: '/posts/{id}', // brackets make id a route parameter, that is available to the controller
-        templateUrl: 'templates/posts.html',
+        templateUrl: '/posts.html',
         controller: 'PostsCtrl'
       });
 
