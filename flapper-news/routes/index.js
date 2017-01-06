@@ -31,71 +31,38 @@ router.post('/posts', function(req, res, next) {
   });
 });
 
-// router.param('post', function(req, res, next, id) {
-//   Post.find(id, function(err, post) {
-//     if (err) {
-//       next(err);
-//     } else if (post) {
-//       req.post = post;
-//       next();
-//     } else {
-//       next(new Error('failed to load post'));
-//     }
-//   });
-//   // var query = Post.findById(id);
-//   // // console.log(id);
+router.param('post', function(req, res, next, id) {
+  var query = Post.findById(id);
 
-//   // query.exec(function (err, post){
-//   //   if (err) { return next(err); }
-//   //   if (!post) { return next(new Error('can\'t find post')); }
-
-//   //   req.post = post;
-//   //   return next();
-//   // });
-// });
-
-// router.param('comment', function(req, res, next, id) {
-//   var query = Comment.findById(id);
-
-//   query.exec(function (err, comment){
-//     if (err) { return next(err); }
-//     if (!comment) { return next(new Error('can\'t find comment')); }
-
-//     req.comment = comment;
-//     return next();
-//   });
-// });
-
-// use the populate() method to get the comments attached to a post
-router.get('/posts/:id', function(req, res, next) {
- 
-  var query = Post.findById(req.params.id);
-  
   query.exec(function (err, post){
     if (err) { return next(err); }
     if (!post) { return next(new Error('can\'t find post')); }
 
+    req.post = post;
+    return next();
+  });
+});
+
+router.param('comment', function(req, res, next, id) {
+  var query = Comment.findById(id);
+
+  query.exec(function (err, comment){
+    if (err) { return next(err); }
+    if (!comment) { return next(new Error('can\'t find comment')); }
+
+    req.comment = comment;
+    return next();
+  });
+});
+
+// use the populate() method to get the comments attached to a post
+router.get('/posts/:post', function(req, res, next) {
+  req.post.populate('comments', function(err, post) {
+    if (err) { return next(err); }
+
     res.json(post);
-    
-  })
-  .then(function(post){
     console.log(post.link);
   });
-
-
-  // Post.findById(req.params.id, function(err, post){res.json(post)})
-  // .then(function(post) {
-  //   console.log(post);
-  //   res.json(post);
-  // })
-  // .catch(function(err) {
-  //   return next(err);
-  // });
-  // req.post.populate('comments', function(err, post) {
-  //   if (err) { return next(err); }
-
-    // res.json(post);
-  // });
 });
 
 // Waldo - need to check curl comman
