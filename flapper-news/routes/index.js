@@ -1,9 +1,136 @@
+var mongoose = require('mongoose');
 var express = require('express');
 var router = express.Router();
+// var ObjectId = mongoose.Schema.ObjectId
+// mongoose.Promise = global.Promise;
+
+
+var Post = mongoose.model('Post');
+var Comment = mongoose.model('Comment');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+router.get('/posts', function(req, res, next) {
+  Post.find(function(err, posts){
+    if(err){ return next(err); }
+
+    res.json(posts);
+  });
+});
+
+router.post('/posts', function(req, res, next) {
+  var post = new Post(req.body);
+
+  post.save(function(err, post){
+    if(err){ return next(err); }
+
+    res.json(post);
+  });
+});
+
+// router.param('post', function(req, res, next, id) {
+//   Post.find(id, function(err, post) {
+//     if (err) {
+//       next(err);
+//     } else if (post) {
+//       req.post = post;
+//       next();
+//     } else {
+//       next(new Error('failed to load post'));
+//     }
+//   });
+//   // var query = Post.findById(id);
+//   // // console.log(id);
+
+//   // query.exec(function (err, post){
+//   //   if (err) { return next(err); }
+//   //   if (!post) { return next(new Error('can\'t find post')); }
+
+//   //   req.post = post;
+//   //   return next();
+//   // });
+// });
+
+// router.param('comment', function(req, res, next, id) {
+//   var query = Comment.findById(id);
+
+//   query.exec(function (err, comment){
+//     if (err) { return next(err); }
+//     if (!comment) { return next(new Error('can\'t find comment')); }
+
+//     req.comment = comment;
+//     return next();
+//   });
+// });
+
+// use the populate() method to get the comments attached to a post
+router.get('/posts/:id', function(req, res, next) {
+ 
+  var query = Post.findById(req.params.id);
+  
+  query.exec(function (err, post){
+    if (err) { return next(err); }
+    if (!post) { return next(new Error('can\'t find post')); }
+
+    res.json(post);
+    
+  })
+  .then(function(post){
+    console.log(post.link);
+  });
+
+
+  // Post.findById(req.params.id, function(err, post){res.json(post)})
+  // .then(function(post) {
+  //   console.log(post);
+  //   res.json(post);
+  // })
+  // .catch(function(err) {
+  //   return next(err);
+  // });
+  // req.post.populate('comments', function(err, post) {
+  //   if (err) { return next(err); }
+
+    // res.json(post);
+  // });
+});
+
+// Waldo - need to check curl comman
+router.put('/posts/:post/upvote', function(req, res, next) {
+  req.post.upvote(function(err, post){
+    if (err) { return next(err); }
+
+    res.json(post);
+  });
+});
+
+router.post('/posts/:post/comments', function(req, res, next) {
+  var comment = new Comment(req.body);
+  comment.post = req.post;
+
+  comment.save(function(err, comment){
+    if(err){ return next(err); }
+
+    req.post.comments.push(comment);
+    req.post.save(function(err, post) {
+      if(err){ return next(err); }
+
+      res.json(comment);
+    });
+  });
+});
+
+// Waldo - need to check curl comman
+router.put('/posts/:post/comments/:comment/upvote', function(req, res, next) {
+  req.comment.upvote(function(err, comment){
+    if (err) { return next(err); }
+
+    res.json(comment);
+  });
+});
+
 
 module.exports = router;
